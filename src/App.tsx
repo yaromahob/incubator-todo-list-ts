@@ -2,46 +2,59 @@ import React from 'react';
 import './App.css';
 import Todolist from "./components/Todolist";
 
+export type TTodolistPropsType = {
+  title: string
+  tasks: Array<TTodolistTask>
+  removeTask: (id: number) => void
+}
+
+type TTodolistTask = {
+  id: number
+  title: string
+  isDone: boolean
+}
 
 function App() {
-  const todoListTitle = 'What to learn'
-  const todoListTitle2 = 'What to learn'
-  const tasks = [
+  const tasksData = [
     {
       id: 1,
-      title: 'HTML&CSS',
-      isDone: true
-    },
-    {
+      title: 'HTML/CSS',
+      isDone: false,
+    }, {
       id: 2,
       title: 'JS/TS',
-      isDone: true
-    },
-    {
+      isDone: false,
+    }, {
       id: 3,
       title: 'React',
-      isDone: false
-    }]
-  const tasks2 = [
-    {
-      id: 1,
-      title: 'Hello World',
-      isDone: true
+      isDone: false,
+    }, {
+      id: 4,
+      title: 'Redux',
+      isDone: false,
+    }, {
+      id: 5,
+      title: 'RTK',
+      isDone: false,
     },
-    {
-      id: 2,
-      title: 'I am Happy',
-      isDone: true
-    },
-    {
-      id: 3,
-      title: 'Yo',
-      isDone: false
-    }]
+  
+  ]
+  const [tasks, setTasks] = React.useState<Array<TTodolistTask>>(tasksData)
+  
+  const todoListTitle = 'What to learn'
+  
+  
+  const removeTask = (id: number) => {
+    const newTasks = tasks.filter(task => task.id !== id)
+    
+    setTasks(newTasks)
+  }
+  
+  
   return (
     <div className="App">
-      <Todolist title={todoListTitle} tasks={tasks}/>
-      <Todolist title={todoListTitle2} tasks={tasks2}/>
+      <Todolist title={todoListTitle} tasks={tasks} removeTask={removeTask}/>
+    
     </div>
   );
 }
