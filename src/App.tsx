@@ -9,6 +9,8 @@ export type TTodolistPropsType = {
   removeTask: (id: string) => void
   changeFilter: (filters: TFilterValueType) => void
   addTask: (task: string) => void
+  changeTaskStatus: (taskId: string, isDone: boolean) => void
+  filter: TFilterValueType
 }
 
 type TTodolistTask = {
@@ -26,6 +28,7 @@ function App() {
       id: v1(),
       title: 'HTML/CSS',
       isDone: true,
+      
     },
     {
       id: v1(),
@@ -51,17 +54,15 @@ function App() {
   
   ]
   const [tasks, setTasks] = React.useState<Array<TTodolistTask>>(tasksData)
-  const [filters, setFilter] = React.useState<TFilterValueType>('all')
+  const [filter, setFilter] = React.useState<TFilterValueType>('all')
   const todoListTitle = 'What to learn'
   
   const removeTask = (id: string) => {
     const newTasks = tasks.filter(task => task.id !== id)
-    
     setTasks(newTasks)
   }
   
   const changeFilter = (filters: TFilterValueType) => {
-    
     setFilter(filters)
   }
   
@@ -71,12 +72,21 @@ function App() {
     setTasks(newTasks)
   }
   
+  const changeTaskStatus = (taskId: string, isDone: boolean) => {
+    const task = tasks.find(task => task.id === taskId)
+    if (task) {
+      task.isDone = isDone
+    }
+    setTasks([...tasks])
+    
+  }
+  
   let tasksForTodoList = tasks;
   
-  if (filters === 'active') {
+  if (filter === 'active') {
     tasksForTodoList = tasksForTodoList.filter(t => !t.isDone)
   }
-  if (filters === 'complete') {
+  if (filter === 'complete') {
     tasksForTodoList = tasksForTodoList.filter(t => t.isDone)
   }
   
@@ -88,6 +98,8 @@ function App() {
         removeTask={removeTask}
         changeFilter={changeFilter}
         addTask={addTask}
+        changeTaskStatus={changeTaskStatus}
+        filter={filter}
       />
     
     </div>
