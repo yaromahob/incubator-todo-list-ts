@@ -1,33 +1,26 @@
-.App {
-    padding: 30px;
-    display: flex;
-}
 
-.App > div {
-    margin-right: 50px;
-}
+/*.App {*/
+/*  padding: 30px;*/
+/*  display: flex;*/
+/*}*/
 
-.error {
-    border: 1px solid red;
-}
+/*.App > div {*/
+/*  margin-right: 50px;*/
+/*}*/
 
-.error-message {
-    color: red;
-}
+/*.error {*/
+/*  border: red 1px solid;*/
+/*}*/
 
-.active-filter {
-    background-color: aquamarine;
-}
+/*.error-message {*/
+/*  color: red;*/
+/*}*/
 
-.is-done {
-    opacity: 0.5;
-}
+/*.active-filter {*/
+/*  background-color: aquamarine;*/
+/*}*/
 
-.active {
-}
+/*.is-done {*/
+/*  opacity: 0.5;*/
+/*}*/
 
-.title-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}

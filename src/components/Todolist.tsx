@@ -1,102 +1,89 @@
-import React, {ChangeEvent, KeyboardEvent} from 'react';
-import {TFilterValueType, TTodolistTask} from "../App";
-import {v1} from 'uuid'
+import React, {ChangeEvent} from 'react';
+import {FilterValuesType} from '../App';
+import {AddItemForm} from './AddItemForm';
+import {EditableSpan} from './EditableSpan';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
 
-type TTodolistPropsType = {
-	todolistID: string
+export type TaskType = {
+	id: string
 	title: string
-	tasks: Array<TTodolistTask>
-	removeTask: (todolistID: string, taskID: string) => void
-	changeFilter: (todolistID: string, filters: TFilterValueType) => void
-	addTask: (todolistID: string, task: string) => void
-	removeTodolist: (todolistID: string) => void
-	changeTaskStatus: (todolistID: string, taskId: string, completedTask: boolean) => void
-	filterTask: TFilterValueType
+	isDone: boolean
 }
 
-const Todolist = (props: TTodolistPropsType) => {
-	const [task, setTask] = React.useState<string>('')
-	const [error, setError] = React.useState<string | null>(null)
+type PropsType = {
+	id: string
+	title: string
+	tasks: Array<TaskType>
+	removeTask: (taskId: string, todolistId: string) => void
+	changeFilter: (value: FilterValuesType, todolistId: string) => void
+	addTask: (title: string, todolistId: string) => void
+	changeTaskStatus: (id: string, isDone: boolean, todolistId: string) => void
+	removeTodolist: (id: string) => void
+	changeTodolistTitle: (id: string, newTitle: string) => void
+	filter: FilterValuesType
+	changeTaskTitle: (taskId: string, newTitle: string, todolistId: string) => void
+}
 
-	const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-		setError(null)
-		setTask(e.target.value)
+export function Todolist(props: PropsType) {
+	const addTask = (title: string) => {
+		props.addTask(title, props.id);
 	}
 
-	const addToTaskList = () => {
-		const trimmedTask = task.trim()
-		if (trimmedTask) {
-			props.addTask(props.todolistID, task)
-		} else setError('Field is required')
-		setTask('')
+	const removeTodolist = () => {
+		props.removeTodolist(props.id);
+	}
+	const changeTodolistTitle = (title: string) => {
+		props.changeTodolistTitle(props.id, title);
 	}
 
-	const onKeyPressHandler = (event: KeyboardEvent<HTMLInputElement>) => event.key === 'Enter' && addToTaskList()
-	const onAllClickHandler = () => props.changeFilter(props.todolistID, 'all')
-	const onActiveClickHandler = () => props.changeFilter(props.todolistID, 'active')
-	const onCompletedClickHandler = () => props.changeFilter(props.todolistID, 'complete')
-	const delTodolistHandler = () => props.removeTodolist(props.todolistID)
+	const onAllClickHandler = () => props.changeFilter("all", props.id);
+	const onActiveClickHandler = () => props.changeFilter("active", props.id);
+	const onCompletedClickHandler = () => props.changeFilter("completed", props.id);
 
-	const tasksList = props.tasks.map(task => {
-		const onRemoveHandler = () => props.removeTask(props.todolistID, task.id)
-		const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => props.changeTaskStatus(props.todolistID, task.id, event.currentTarget.checked)
+	return <div>
+		<h3><EditableSpan value={props.title} onChange={changeTodolistTitle}/>
+			{/*<button onClick={removeTodolist}>x</button>*/}
+			<IconButton aria-label="delete" onClick={removeTodolist}>
+				<DeleteIcon/>
+			</IconButton>
+		</h3>
+		<AddItemForm addItem={addTask}/>
+		<ul>
+			{
+				props.tasks.map(t => {
+					const onClickHandler = () => props.removeTask(t.id, props.id)
+					const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+						let newIsDoneValue = e.currentTarget.checked;
+						props.changeTaskStatus(t.id, newIsDoneValue, props.id);
+					}
+					const onTitleChangeHandler = (newValue: string) => {
+						props.changeTaskTitle(t.id, newValue, props.id);
+					}
 
-		return (
-			<li
-				className={task.isDone ? 'is-done' : ''}
-				key={v1()}>
-				<input
-					type="checkbox"
-					checked={task.isDone}
-					onChange={onChangeHandler}
-				/>
-				<span>
-          {task.title}
-        </span>
-				<button onClick={onRemoveHandler}>x</button>
-			</li>
-		)
-	})
 
-	return (
+					return <li key={t.id} className={t.isDone ? "is-done" : ""}>
+						<Checkbox defaultChecked onChange={onChangeHandler} checked={t.isDone}/>
+						<EditableSpan value={t.title} onChange={onTitleChangeHandler}/>
+						<IconButton aria-label="delete" onClick={onClickHandler}>
+							<DeleteIcon/>
+						</IconButton>
+					</li>
+				})
+			}
+		</ul>
 		<div>
-			<div className="title-wrapper">
-				<h3>{props.title}</h3>
-				<button onClick={delTodolistHandler}>x</button>
-			</div>
-			<div>
-				<input
-					type="text"
-					className={error ? 'error' : ''}
-					value={task}
-					onChange={onChangeInput}
-					onKeyDown={onKeyPressHandler}
-				/>
-				<button onClick={addToTaskList}>+</button>
-				{error && <div className='error-message'>{error}</div>}
-			</div>
-			<ul>
-				{tasksList}
-			</ul>
-			<div>
-				<button
-					className={props.filterTask === 'all' ? 'active-filter' : ''}
-					onClick={onAllClickHandler}>
-					All
-				</button>
-				<button
-					className={props.filterTask === 'active' ? 'active-filter' : ''}
-					onClick={onActiveClickHandler}>
-					Active
-				</button>
-				<button
-					className={props.filterTask === 'complete' ? 'active-filter' : ''}
-					onClick={onCompletedClickHandler}>
-					Completed
-				</button>
-			</div>
-		</div>
-	);
-};
+			<Button variant={props.filter === 'all' ? "outlined" : "contained"} color="secondary"
+							onClick={onAllClickHandler}>All</Button>
+			<Button variant={props.filter === 'active' ? "outlined" : "contained"} color="success"
+							onClick={onActiveClickHandler}>Active</Button>
+			<Button variant={props.filter === 'completed' ? "outlined" : "contained"} color="error"
+							onClick={onCompletedClickHandler}>Completed</Button>
 
-export default Todolist;
+		</div>
+	</div>
+}
+
+
