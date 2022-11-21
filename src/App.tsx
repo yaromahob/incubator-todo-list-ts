@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import './App.css';
 import {TaskType} from './components/Todolist';
 import {AddItemForm} from './components/AddItemForm';
@@ -25,12 +25,15 @@ export type TasksStateType = {
 function App() {
   
   let todolists = useSelector<AppRootStateType, Array<TodolistType>>(state => state.todolists);
-  
   const dispatch = useDispatch();
   
-  function addTodolist(title: string) {
-    dispatch(addTodolistAC(title));
-  }
+  const addTodolist = useCallback(
+    (title: string) => {
+      dispatch(addTodolistAC(title));
+    },
+    [dispatch],
+  );
+  
   
   return (
     <div className="App">
