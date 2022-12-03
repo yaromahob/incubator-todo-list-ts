@@ -1,31 +1,30 @@
 import React, {useEffect, useState} from 'react'
 import {todolistApi} from "../api/todolist-api";
 import { v1 } from 'uuid';
+import {taskApi} from "../api/task-api";
 
 export default {
-  title: 'API'
+  title: 'API/TASKS'
 }
 
 
-export const GetTodolists = () => {
+export const GetTasksTodolist = () => {
   const [state, setState] = useState<any>(null)
   useEffect(() => {
-    todolistApi.getTodolists()
+    taskApi.getTasks('b353302a-327c-438e-9fe2-18ece58c8b29')
       .then((res) => {
-        console.log(res.data);
-      setState(res.data)
+        console.log('GET_TASKS', res);
+        setState(res.data.items)
     })
   }, [])
   return <div>{JSON.stringify(state)}</div>
 }
-export const CreateTodolist = () => {
+export const CreateTask = () => {
   const [state, setState] = useState<any>(null)
   useEffect(() => {
-
-     const todolistTitle = 'I have dinner'
-
-    todolistApi.createTodolist(todolistTitle).then(res => {
-      console.log(res);
+     const taskTitle = 'I have dinner'
+    taskApi.createTask('b353302a-327c-438e-9fe2-18ece58c8b29', taskTitle).then(res => {
+      console.log('Create_Task', res);
     })
     
     
@@ -33,26 +32,26 @@ export const CreateTodolist = () => {
   
   return <div>{JSON.stringify(state)}</div>
 }
-export const DeleteTodolist = () => {
+export const DeleteTask = () => {
   const [state, setState] = useState<any>(null)
   useEffect(() => {
     const todolistId = "0f55db03-9e82-44ae-a5b3-a605f2052e12"
-    todolistApi.deleteTodolist(todolistId)
+    taskApi.deleteTask('b353302a-327c-438e-9fe2-18ece58c8b29', '02fde268-c80e-47c1-8a6b-ef9b3cb10bed')
       .then(res => {
-        console.log(res);
+        console.log('DELETE_TASK', res);
       })
   }, [])
   
   return <div>{JSON.stringify(state)}</div>
 }
-export const UpdateTodolistTitle = () => {
+export const UpdateTaskTitle = () => {
   const [state, setState] = useState<any>(null)
   useEffect(() => {
-    const newTodolistTitle = 'AbraCadabraAPIAPI'
+    const newTodolistTitle = 'ALLO DAROVA'
     const todolistId = "b353302a-327c-438e-9fe2-18ece58c8b29"
-    todolistApi.updateTodolist(todolistId, newTodolistTitle )
+    taskApi.updateTaskTitle(todolistId, newTodolistTitle )
       .then(res => {
-        console.log(res);
+        console.log('UPDATE_TASK', res);
         setState(res.data)
       })
     
