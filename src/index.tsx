@@ -4,7 +4,7 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import {store} from './state/store';
 import {Provider} from 'react-redux';
-import App from './App';
+import App from './App/App';
 
 const container = document.getElementById('root') as HTMLElement
 const root = createRoot(container);

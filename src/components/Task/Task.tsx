@@ -1,21 +1,22 @@
 import React, {ChangeEvent, memo} from 'react';
 import Checkbox from "@mui/material/Checkbox";
-import {EditableSpan} from "./EditableSpan";
+import {EditableSpan} from "../EditableSpan/EditableSpan";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {TaskStatusesType} from "../../api/task-api";
 
 type TaskType = {
   taskID: string
-  isDone: boolean
+  status: TaskStatusesType
   title: string
   onClickRemove: (taskId: string) => void
-  onChangeStatus: (taskID: string, isCompleted: boolean) => void
+  onChangeStatus: (taskID: string, status: TaskStatusesType) => void
   onChangeTitle: (taskID: string, title: string) => void
 }
 
 const Task: React.FC<TaskType> = memo(({
                                          taskID,
-                                         isDone,
+                                         status,
                                          title,
                                          onClickRemove,
                                          onChangeStatus,
@@ -23,11 +24,13 @@ const Task: React.FC<TaskType> = memo(({
                                        }) => {
   console.log('TASK_RERENDER');
   
-  const onClickRemoveHandler = () => onClickRemove(taskID);
+  const onClickRemoveHandler = () => {
+    onClickRemove(taskID)
+  };
   
   const onChangeStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
     let isCompleted = e.currentTarget.checked;
-    onChangeStatus(taskID, isCompleted);
+    onChangeStatus(taskID, status);
   };
   
   const onChangeTitleHandler = (newValue: string) => {
@@ -35,8 +38,8 @@ const Task: React.FC<TaskType> = memo(({
   };
   
   return (
-    <li key={taskID} className={isDone ? "is-done" : ""}>
-      <Checkbox onChange={onChangeStatusHandler} checked={isDone}/>
+    <li key={taskID} className={status ? "is-done" : ""}>
+      <Checkbox onChange={onChangeStatusHandler} checked={status === 2}/>
       <EditableSpan value={title} onChange={onChangeTitleHandler}/>
       <IconButton aria-label="delete" onClick={onClickRemoveHandler}>
         <DeleteIcon/>

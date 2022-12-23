@@ -3,7 +3,7 @@ import {ComponentStory, ComponentMeta} from '@storybook/react';
 import {action} from '@storybook/addon-actions';
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { AddItemForm } from '../components/AddItemForm';
+import { AddItemForm } from './AddItemForm';
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {

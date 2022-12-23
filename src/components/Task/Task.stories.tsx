@@ -1,7 +1,8 @@
 import React from 'react';
 import {ComponentStory, ComponentMeta} from '@storybook/react';
 import {action} from '@storybook/addon-actions';
-import Task from '../components/Task';
+import Task from './Task';
+import { TaskStatusesType } from '../../api/task-api';
 
 
 
@@ -30,14 +31,14 @@ const Template: ComponentStory<typeof Task> = (args) => <Task {...args} />;
 export const TaskisDoneStory = Template.bind({});
 
 TaskisDoneStory.args = {
-  isDone: true,
+  status: TaskStatusesType.Completed,
 };
 //--------------------------------------------------------
 
 export const TaskisNotDoneStory = Template.bind({});
 
 TaskisNotDoneStory.args = {
-  isDone: false,
+  status: TaskStatusesType.New,
 };
 
 

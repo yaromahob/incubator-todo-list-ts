@@ -1,7 +1,7 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
 import {ComponentStory, ComponentMeta} from '@storybook/react';
 
-import App from "../App";
+import App from "../App/App";
 
 import {ReduxStoreProviderDecorator} from "../state/ReduxStoreProviderDecorator";
 

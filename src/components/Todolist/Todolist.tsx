@@ -1,38 +1,45 @@
-import React, {memo, useCallback} from 'react';
-import {FilterValuesType} from "../App";
-import {EditableSpan} from "./EditableSpan";
+import React, {memo, useCallback, useEffect} from 'react';
+import {EditableSpan} from "../EditableSpan/EditableSpan";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {AddItemForm} from "./AddItemForm";
-import {useDispatch, useSelector} from "react-redux";
-import {AppRootStateType} from "../state/store";
-import {changeFilterAC, changeTodolistTitleAC, removeTodolistAC} from "../state/todolist-reducer";
-import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC} from "../state/task-reducer";
-import Task from "./Task";
-import ButtonContainer from "./ButtonContainer";
+import {AddItemForm} from "../AddItemFrom/AddItemForm";
+import {useAppDispatch, useAppSelector} from "../../state/store";
+import {changeFilterAC, changeTodolistTitleAC, FilterValuesType, removeTodolistAC} from "../../state/todolist-reducer";
+import {
+  addTaskTC,
+  changeTaskStatusAC,
+  deleteTaskTC,
+  getTasksTC,
+  removeTaskAC, updateTaskTC, updateTaskTitleTC
+} from "../../state/task-reducer";
+import Task from "../Task/Task";
+import ButtonContainer from "../ButtonContainer";
+import {TaskStatusesType, TTaskApi} from "../../api/task-api";
 
-export type TaskType = {
-  id: string
-  title: string
-  isDone: boolean
-}
+
 
 export type TodolistPropsType = {
   todolistId: string
   title: string
   filter: FilterValuesType
+  addedDate: string;
+  order: number;
 }
 
 const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
   console.log('Todolist_RERENDER');
+  useEffect(() => {
+    dispatch(getTasksTC(todolistId))
+  },[])
   
-  let tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[todolistId]);
+  const dispatch = useAppDispatch();
+  let tasks = useAppSelector< Array<TTaskApi>>(state => state.tasks[todolistId]);
   
-  const dispatch = useDispatch();
+
   
   const addTask = useCallback(
     (title: string) => {
-      dispatch(addTaskAC(todolistId, title));
+      dispatch(addTaskTC(todolistId, title))
     },
     [dispatch, todolistId],
   );
@@ -50,12 +57,12 @@ const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
     dispatch(removeTaskAC(taskId, todolistId));
   }, [dispatch]);
   
-  const changeTaskStatus = useCallback((todolistId: string, taskID: string, isCompleted: boolean) => {
-    dispatch(changeTaskStatusAC(todolistId, taskID, isCompleted));
+  const changeTaskStatus = useCallback((todolistId: string, taskID: string, status: TaskStatusesType) => {
+    dispatch(updateTaskTC(todolistId, taskID, status));
   }, [dispatch]);
   
   const changeTaskTitle = useCallback((todolistId: string, taskID: string, title: string) => {
-    dispatch(changeTaskTitleAC(todolistId, taskID, title));
+    dispatch(updateTaskTitleTC(todolistId, taskID, title))
   }, [dispatch]);
   
   
@@ -65,10 +72,12 @@ const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
   
   const onCompletedClickHandler = useCallback(() => dispatch(changeFilterAC('completed', todolistId)), [dispatch, todolistId]);
   
-  const onClickRemoveHandler = useCallback((taskId: string) => removeTask(taskId, todolistId), [removeTask, todolistId]);
+  const onClickRemoveHandler = useCallback((taskId: string) => {
+    dispatch(deleteTaskTC(todolistId, taskId))
+  }, [ removeTask, todolistId]);
   
-  const onChangeStatusHandler = useCallback((taskID: string, isCompleted: boolean) => {
-    changeTaskStatus(todolistId, taskID, isCompleted);
+  const onChangeStatusHandler = useCallback((taskID: string, status: TaskStatusesType) => {
+    changeTaskStatus(todolistId, taskID, status);
   }, [changeTaskStatus, todolistId]);
   
   const onChangeTitleHandler = useCallback((taskID: string, newValue: string) => {
@@ -77,14 +86,16 @@ const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
   
   
   if (filter === "active") {
-    tasks = tasks.filter(t => !t.isDone);
+    tasks = tasks.filter(t => !t.status);
   }
   if (filter === "completed") {
-    tasks = tasks.filter(t => t.isDone);
+    tasks = tasks.filter(t => t.status);
   }
   
-  return <div>
-    <h3><EditableSpan value={title} onChange={changeTodolistTitle}/>
+  return (
+    <div>
+    <h3>
+      <EditableSpan value={title} onChange={changeTodolistTitle}/>
       {/*<button onClick={removeTodolist}>x</button>*/}
       <IconButton aria-label="delete" onClick={removeTodolist}>
         <DeleteIcon/>
@@ -93,13 +104,13 @@ const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
     <AddItemForm addItem={addTask}/>
     <ul>
       {
-        tasks.map(t => {
-          
-          
+        tasks.map((t) => {
+
+
           return (
             <Task key={t.id}
                   taskID={t.id}
-                  isDone={t.isDone}
+                  status={t.status}
                   title={t.title}
                   onChangeStatus={onChangeStatusHandler}
                   onChangeTitle={onChangeTitleHandler}
@@ -122,17 +133,9 @@ const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
                        buttonTitle={'Completed'}
                        buttonColor={"error"}
                        callback={onCompletedClickHandler}/>
-      {/*<Button variant={filter === 'all' ? "outlined" : "contained"} color="secondary"
-      "secondary" | "success" | "error"
-      */}
-      {/*        onClick={onAllClickHandler}>All</Button>*/}
-      {/*<Button variant={filter === 'active' ? "outlined" : "contained"} color="success"*/}
-      {/*        onClick={onActiveClickHandler}>Active</Button>*/}
-      {/*<Button variant={filter === 'completed' ? "outlined" : "contained"} color="error"*/}
-      {/*        onClick={onCompletedClickHandler}>Completed</Button>*/}
     
     </div>
-  </div>;
+  </div>);
 });
 
 export default Todolist;

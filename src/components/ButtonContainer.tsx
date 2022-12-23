@@ -1,6 +1,6 @@
 import React, {memo} from 'react';
 import Button from "@mui/material/Button";
-import {FilterValuesType} from "../App";
+import { FilterValuesType } from '../state/todolist-reducer';
 
 type ButtonContainerType = {
   filter: FilterValuesType

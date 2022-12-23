@@ -16,20 +16,32 @@ const instance = axios.create({
 export const taskApi = {
   getTasks(todolistID: string) {
     
-    return instance.get<TTaskResponse>(`todo-lists/b353302a-327c-438e-9fe2-18ece58c8b29/tasks`)
+    return instance.get<TTaskResponse>(`todo-lists/${todolistID}/tasks`)
   },
   createTask(todolistID: string, title: string){
     
-    return instance.post<TTaskCUD>(`todo-lists/b353302a-327c-438e-9fe2-18ece58c8b29/tasks`, {title: "ALLO DAROVA"})
+    return instance.post<TTaskCUD<{item: TTaskApi}>>(`todo-lists/${todolistID}/tasks`, {title: title})
   },
-  updateTaskTitle(todolistID: string, title: string){
+  updateTaskTitle(todolistID: string, taskID: string, title: string){
     
-    return instance.put<TTaskCUD>(`todo-lists/b353302a-327c-438e-9fe2-18ece58c8b29/tasks/5da9e1f5-2c41-4270-b395-3aa7d27efc41`, {title: 'ALLO---DAROVA'})
+    return instance.put<TTaskCUD<{}>>(`todo-lists/${todolistID}/tasks/${taskID}`, {title})
+  },
+  updateTask(todolistID: string, taskID: string, model: UpdateTaskModelType){
+    return instance.put<TTaskCUD<{item: UpdateTaskModelType}>>(`todo-lists/${todolistID}/tasks/${taskID}`, model)
   },
   deleteTask(todolistID: string, taskID: string){
-    
-    return instance.delete<TTaskCUD>(`todo-lists/b353302a-327c-438e-9fe2-18ece58c8b29/tasks/5da9e1f5-2c41-4270-b395-3aa7d27efc41`)
+    return instance.delete<TTaskCUD<{}>>(`todo-lists/${todolistID}/tasks/${taskID}`)
   }
+}
+
+export type UpdateTaskModelType = {
+  title: string
+  description: string
+  completed: boolean
+  status: TaskStatusesType
+  priority: TaskPrioritiesType
+  startDate: string
+  deadline: string
 }
 
 
@@ -39,21 +51,36 @@ export type TTaskResponse = {
   error: null
 }
 
+export enum TaskStatusesType {
+  New = 0,
+  InProgress = 1,
+  Completed = 2,
+  Draft = 3
+}
+
+export enum TaskPrioritiesType {
+  Low,
+  Middle,
+  Hi,
+  Urgently,
+  Later
+}
+
 
 export type TTaskApi = {
   addedDate: string
-  deadline: null
-  description: null
+  deadline: string
+  description: string
   id: string
   order: number
   priority: number
-  startDate: null
+  startDate: string
   status: number
   title: string
   todoListId: string
 }
 
-type TTaskCUD<T = {}> = {
+type TTaskCUD<T> = {
   data: T
   fieldsErrors: Array<string>
   messages: Array<string>

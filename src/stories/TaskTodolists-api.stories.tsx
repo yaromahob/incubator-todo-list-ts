@@ -47,13 +47,13 @@ export const DeleteTask = () => {
 export const UpdateTaskTitle = () => {
   const [state, setState] = useState<any>(null)
   useEffect(() => {
-    const newTodolistTitle = 'ALLO DAROVA'
-    const todolistId = "b353302a-327c-438e-9fe2-18ece58c8b29"
-    taskApi.updateTaskTitle(todolistId, newTodolistTitle )
-      .then(res => {
-        console.log('UPDATE_TASK', res);
-        setState(res.data)
-      })
+    // const newTodolistTitle = 'ALLO DAROVA'
+    // const todolistId = "b353302a-327c-438e-9fe2-18ece58c8b29"
+    // taskApi.updateTaskTitle(todolistID, taskID, title )
+    //   .then(res => {
+    //     console.log('UPDATE_TASK', res);
+    //     setState(res.data)
+    //   })
     
   }, [])
   
