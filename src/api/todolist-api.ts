@@ -1,33 +1,30 @@
 import axios from "axios";
 
 
-
 const instance = axios.create({
   baseURL: 'https://social-network.samuraijs.com/api/1.1/',
   withCredentials: true,
   headers: {
-  'api-key': '52a1ca5e-dff7-4291-84cc-1f73b5c262f4'
+    'api-key': '52a1ca5e-dff7-4291-84cc-1f73b5c262f4'
   },
   
-})
-
+});
 
 
 export const todolistApi = {
   getTodolists() {
-    return instance.get<Array<TTodolistApi>>(`todo-lists`)
+    return instance.get<Array<TTodolistApi>>(`todo-lists`);
   },
-  createTodolist(todolistTitle: string){
-    return instance.post<TTodolistResponse<{item: TTodolistApi[]}>>('todo-lists', {title: todolistTitle})
+  createTodolist(todolistTitle: string) {
+    return instance.post<ResponseType<{ item: TTodolistApi }>>('todo-lists', {title: todolistTitle});
   },
-  updateTodolist(todolistID: string, newTodolistTitle: string){
-    return instance.put<TTodolistResponse>(`todo-lists/${todolistID}`, {title: newTodolistTitle})
+  updateTodolist(todolistID: string, newTodolistTitle: string) {
+    return instance.put<ResponseType>(`todo-lists/${todolistID}`, {title: newTodolistTitle});
   },
-  deleteTodolist(todolistID: string){
-    return instance.delete<TTodolistResponse>(`todo-lists/${todolistID}`)
+  deleteTodolist(todolistID: string) {
+    return instance.delete<ResponseType>(`todo-lists/${todolistID}`);
   }
-}
-
+};
 
 
 export type TTodolistApi = {
@@ -37,9 +34,15 @@ export type TTodolistApi = {
   order: number;
 }
 
-export type TTodolistResponse<T = {}> = {
+export type ResponseType<T = {}> = {
   data: T
   fieldsErrors: Array<string>
   messages: Array<string>
   resultCode: number
+}
+
+export enum RESULT_CODE {
+  SUCCESS = 0,
+  ERROR = 1,
+  CAPTCHA = 10
 }

@@ -4,7 +4,7 @@ import {AddItemForm} from "../AddItemFrom/AddItemForm";
 import Paper from "@mui/material/Paper/Paper";
 import Todolist from "./Todolist";
 import {useAppDispatch, useAppSelector} from "../../state/store";
-import {addTodolistAC, getTodolistTC, TodolistDomainType} from "../../state/todolist-reducer";
+import {createTodoListTC, getTodolistTC, TodolistDomainType} from "../../state/todolist-reducer";
 
 const TodolistContainer = () => {
   let todolists = useAppSelector<Array<TodolistDomainType>>(state => state.todolists);
@@ -12,29 +12,29 @@ const TodolistContainer = () => {
   
   const addTodolist = useCallback(
     (title: string) => {
-      dispatch(addTodolistAC(title));
+      dispatch(createTodoListTC(title));
     },
     [dispatch],
   );
   
   useEffect(() => {
-    dispatch(getTodolistTC())
-  }, [])
-  
+    dispatch(getTodolistTC());
+  }, [dispatch]);
   
   return (
-      <>
+    <>
       <Grid container style={{padding: "40px 40px 40px 0px"}}>
         <AddItemForm addItem={addTodolist}/>
       </Grid>
-    
+      
       <Grid container spacing={3}>
         {todolists.map(tl => {
-        
+          
           return <Grid item key={tl.id}>
             <Paper style={{padding: "10px"}}>
               <Todolist
                 todolistId={tl.id}
+                entityStatus={tl.entityStatus}
                 title={tl.title}
                 filter={tl.filter}
                 addedDate={tl.addedDate}
@@ -44,8 +44,8 @@ const TodolistContainer = () => {
           </Grid>;
         })}
       </Grid>
-
-      </>
+    
+    </>
   );
 };
 

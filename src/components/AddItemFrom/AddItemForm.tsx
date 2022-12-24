@@ -4,7 +4,9 @@ import TextField from '@mui/material/TextField';
 
 type AddItemFormPropsType = {
   addItem: (title: string) => void
+  disabled?: boolean
 }
+
 
 export const AddItemForm: React.FC<AddItemFormPropsType> = memo((props) => {
   let [title, setTitle] = useState("");
@@ -36,6 +38,7 @@ export const AddItemForm: React.FC<AddItemFormPropsType> = memo((props) => {
       value={title}
       onChange={onChangeHandler}
       onKeyPress={onKeyPressHandler}
+      disabled={props.disabled}
       id="outlined-basic"
       label={error ? "Title is required" : "type out here..."}
       variant="outlined"

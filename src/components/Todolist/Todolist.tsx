@@ -4,65 +4,70 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {AddItemForm} from "../AddItemFrom/AddItemForm";
 import {useAppDispatch, useAppSelector} from "../../state/store";
-import {changeFilterAC, changeTodolistTitleAC, FilterValuesType, removeTodolistAC} from "../../state/todolist-reducer";
+import {
+  changeFilterAC,
+  FilterValuesType,
+  removeTodoListTC,
+  updateTodolistTitleTC
+} from "../../state/todolist-reducer";
 import {
   addTaskTC,
-  changeTaskStatusAC,
   deleteTaskTC,
   getTasksTC,
-  removeTaskAC, updateTaskTC, updateTaskTitleTC
+  updateTaskTC,
+  updateTaskTitleTC
 } from "../../state/task-reducer";
 import Task from "../Task/Task";
 import ButtonContainer from "../ButtonContainer";
 import {TaskStatusesType, TTaskApi} from "../../api/task-api";
-
+import {RequestStatusType} from "../../App/app-reducer";
 
 
 export type TodolistPropsType = {
   todolistId: string
   title: string
   filter: FilterValuesType
-  addedDate: string;
-  order: number;
+  entityStatus: RequestStatusType
+  addedDate: string
+  order: number
 }
 
-const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
+const Todolist = memo(({todolistId, filter, title, entityStatus}: TodolistPropsType) => {
   console.log('Todolist_RERENDER');
-  useEffect(() => {
-    dispatch(getTasksTC(todolistId))
-  },[])
   
   const dispatch = useAppDispatch();
-  let tasks = useAppSelector< Array<TTaskApi>>(state => state.tasks[todolistId]);
+  let tasks = useAppSelector<Array<TTaskApi>>(state => state.tasks[todolistId]);
   
-
+  useEffect(() => {
+    dispatch(getTasksTC(todolistId));
+  }, [dispatch, todolistId]);
   
   const addTask = useCallback(
     (title: string) => {
-      dispatch(addTaskTC(todolistId, title))
+      dispatch(addTaskTC(todolistId, title));
     },
     [dispatch, todolistId],
   );
   
   
   const removeTodolist = useCallback(() => {
-    dispatch(removeTodolistAC(todolistId));
+    dispatch(removeTodoListTC(todolistId));
   }, [dispatch, todolistId]);
   
-  const changeTodolistTitle = useCallback(() => {
-    dispatch(changeTodolistTitleAC(todolistId, title));
-  }, [dispatch, todolistId, title]);
+  const changeTodolistTitle = useCallback((title: string) => {
+    dispatch(updateTodolistTitleTC(todolistId, title));
+  }, [dispatch, todolistId]);
   
-  const removeTask = useCallback((taskId: string, todolistId: string) => {
-    dispatch(removeTaskAC(taskId, todolistId));
-  }, [dispatch]);
+  // const removeTask = useCallback((taskId: string, todolistId: string) => {
+  //   dispatch(removeTaskAC(taskId, todolistId));
+  // }, [dispatch]);
   
   const changeTaskStatus = useCallback((todolistId: string, taskID: string, status: TaskStatusesType) => {
     dispatch(updateTaskTC(todolistId, taskID, status));
   }, [dispatch]);
   
   const changeTaskTitle = useCallback((todolistId: string, taskID: string, title: string) => {
-    dispatch(updateTaskTitleTC(todolistId, taskID, title))
+    dispatch(updateTaskTitleTC(todolistId, taskID, title));
   }, [dispatch]);
   
   
@@ -73,8 +78,8 @@ const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
   const onCompletedClickHandler = useCallback(() => dispatch(changeFilterAC('completed', todolistId)), [dispatch, todolistId]);
   
   const onClickRemoveHandler = useCallback((taskId: string) => {
-    dispatch(deleteTaskTC(todolistId, taskId))
-  }, [ removeTask, todolistId]);
+    dispatch(deleteTaskTC(todolistId, taskId));
+  }, [dispatch, todolistId]);
   
   const onChangeStatusHandler = useCallback((taskID: string, status: TaskStatusesType) => {
     changeTaskStatus(todolistId, taskID, status);
@@ -94,48 +99,50 @@ const Todolist = memo(({todolistId, filter, title}: TodolistPropsType) => {
   
   return (
     <div>
-    <h3>
-      <EditableSpan value={title} onChange={changeTodolistTitle}/>
-      {/*<button onClick={removeTodolist}>x</button>*/}
-      <IconButton aria-label="delete" onClick={removeTodolist}>
-        <DeleteIcon/>
-      </IconButton>
-    </h3>
-    <AddItemForm addItem={addTask}/>
-    <ul>
-      {
-        tasks.map((t) => {
-
-
-          return (
-            <Task key={t.id}
-                  taskID={t.id}
-                  status={t.status}
-                  title={t.title}
-                  onChangeStatus={onChangeStatusHandler}
-                  onChangeTitle={onChangeTitleHandler}
-                  onClickRemove={onClickRemoveHandler}
-            />
-          );
-        })
-      }
-    </ul>
-    <div>
-      <ButtonContainer filter={filter}
-                       buttonTitle={'All'}
-                       buttonColor={"secondary"}
-                       callback={onAllClickHandler}/>
-      <ButtonContainer filter={filter}
-                       buttonTitle={'Active'}
-                       buttonColor={"success"}
-                       callback={onActiveClickHandler}/>
-      <ButtonContainer filter={filter}
-                       buttonTitle={'Completed'}
-                       buttonColor={"error"}
-                       callback={onCompletedClickHandler}/>
-    
-    </div>
-  </div>);
+      <h3>
+        <EditableSpan value={title} onChange={changeTodolistTitle}/>
+        {/*<button onClick={removeTodolist}>x</button>*/}
+        <IconButton aria-label="delete"
+                    onClick={removeTodolist}
+                    disabled={entityStatus === "loading"}>
+          <DeleteIcon/>
+        </IconButton>
+      </h3>
+      <AddItemForm addItem={addTask} disabled={entityStatus === "loading"}/>
+      <ul>
+        {
+          tasks.map((t) => {
+            
+            
+            return (
+              <Task key={t.id}
+                    taskID={t.id}
+                    status={t.status}
+                    title={t.title}
+                    onChangeStatus={onChangeStatusHandler}
+                    onChangeTitle={onChangeTitleHandler}
+                    onClickRemove={onClickRemoveHandler}
+              />
+            );
+          })
+        }
+      </ul>
+      <div>
+        <ButtonContainer filter={filter}
+                         buttonTitle={'All'}
+                         buttonColor={"secondary"}
+                         callback={onAllClickHandler}/>
+        <ButtonContainer filter={filter}
+                         buttonTitle={'Active'}
+                         buttonColor={"success"}
+                         callback={onActiveClickHandler}/>
+        <ButtonContainer filter={filter}
+                         buttonTitle={'Completed'}
+                         buttonColor={"error"}
+                         callback={onCompletedClickHandler}/>
+      
+      </div>
+    </div>);
 });
 
 export default Todolist;
