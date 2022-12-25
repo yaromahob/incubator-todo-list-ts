@@ -2,7 +2,7 @@ import {AddTodolistACType, RemoveTodolistACType, SetTodoListsACType} from "./tod
 import {taskApi, TaskStatusesType, TTaskApi, UpdateTaskModelType} from "../api/task-api";
 import {Dispatch} from "redux";
 import {AppRootStateType} from "./store";
-import {RequestStatusType, SetErrorType, setStatus, SetStatusType} from "../App/app-reducer";
+import {RequestStatusType, SetErrorType, setAppStatus, SetStatusType} from "../App/app-reducer";
 import axios, {AxiosError} from "axios";
 import {RESULT_CODE} from "../api/todolist-api";
 import {handleServerAppError, handleServerNetworkError} from "../utils/error-utils";
@@ -126,11 +126,11 @@ export const changeEntityStatusAC = (todolistID: string, taskID: string, entityS
 // thunk
 
 export const getTasksTC = (todolistId: string) => (dispatch: Dispatch) => {
-  dispatch(setStatus('loading'));
+  dispatch(setAppStatus('loading'));
   taskApi.getTasks(todolistId)
     .then((res) => {
       dispatch(getTasksAC(todolistId, res.data.items));
-      dispatch(setStatus('succeeded'));
+      dispatch(setAppStatus('succeeded'));
     })
     .catch((e: AxiosError<{ message: string }>) => {
       const error = e.response ? e.response.data.message : e.message;
@@ -139,13 +139,13 @@ export const getTasksTC = (todolistId: string) => (dispatch: Dispatch) => {
 };
 
 export const deleteTaskTC = (todolistID: string, taskID: string) => (dispatch: Dispatch<ActionType>) => {
-  dispatch(setStatus('loading'));
+  dispatch(setAppStatus('loading'));
   dispatch(changeEntityStatusAC(todolistID, taskID, 'loading'));
   taskApi.deleteTask(todolistID, taskID)
     .then((res) => {
       if (res.data.resultCode === RESULT_CODE.SUCCESS) {
         dispatch(removeTaskAC(taskID, todolistID));
-        dispatch(setStatus('succeeded'));
+        dispatch(setAppStatus('succeeded'));
         dispatch(changeEntityStatusAC(todolistID, taskID, 'succeeded'));
       }
     })
@@ -157,18 +157,18 @@ export const deleteTaskTC = (todolistID: string, taskID: string) => (dispatch: D
 
 export const addTaskTC = (todolistID: string, title: string) =>
   async (dispatch: Dispatch<ActionType>) => {
-    dispatch(setStatus('loading'));
+    dispatch(setAppStatus('loading'));
     
     try {
       const res = await taskApi.createTask(todolistID, title);
       
       if (res.data.resultCode === RESULT_CODE.SUCCESS) {
         dispatch(addTaskAC(todolistID, res.data.data.item));
-        dispatch(setStatus('succeeded'));
+        dispatch(setAppStatus('succeeded'));
       } else {
         handleServerAppError<{ item: TTaskApi }>(dispatch, res.data);
       }
-      dispatch(setStatus('failed'));
+      dispatch(setAppStatus('failed'));
     } catch (e) {
       if (axios.isAxiosError(e)) {
         const error = e.response ? e.response.data.message : e.message;
@@ -178,13 +178,13 @@ export const addTaskTC = (todolistID: string, title: string) =>
   };
 
 export const updateTaskTitleTC = (todolistID: string, taskID: string, title: string) => (dispatch: Dispatch<ActionType>) => {
-  dispatch(setStatus('loading'));
+  dispatch(setAppStatus('loading'));
   dispatch(changeEntityStatusAC(todolistID, taskID, 'loading'));
   taskApi.updateTaskTitle(todolistID, taskID, title)
     .then(res => {
       if (res.data.resultCode === RESULT_CODE.SUCCESS) {
         dispatch(changeTaskTitleAC(todolistID, taskID, title));
-        dispatch(setStatus('succeeded'));
+        dispatch(setAppStatus('succeeded'));
         dispatch(changeEntityStatusAC(todolistID, taskID, 'succeeded'));
       } else {
         handleServerAppError<{}>(dispatch, res.data);
@@ -211,12 +211,12 @@ export const updateTaskTC = (todolistID: string, taskID: string, status: TaskSta
       priority: task.priority,
       startDate: task.startDate
     };
-    dispatch(setStatus('loading'));
+    dispatch(setAppStatus('loading'));
     
     taskApi.updateTask(todolistID, taskID, model)
       .then(res => {
         dispatch(changeTaskStatusAC(todolistID, taskID, res.data.data.item.status));
-        dispatch(setStatus('succeeded'));
+        dispatch(setAppStatus('succeeded'));
       })
       .catch((e: AxiosError<{ message: string }>) => {
         const error = e.response ? e.response.data.message : e.message;

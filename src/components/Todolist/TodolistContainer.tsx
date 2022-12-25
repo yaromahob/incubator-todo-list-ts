@@ -5,9 +5,11 @@ import Paper from "@mui/material/Paper/Paper";
 import Todolist from "./Todolist";
 import {useAppDispatch, useAppSelector} from "../../state/store";
 import {createTodoListTC, getTodolistTC, TodolistDomainType} from "../../state/todolist-reducer";
+import {Navigate} from "react-router-dom";
 
 const TodolistContainer = () => {
-  let todolists = useAppSelector<Array<TodolistDomainType>>(state => state.todolists);
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn);
+  const todolists = useAppSelector<Array<TodolistDomainType>>(state => state.todolists);
   const dispatch = useAppDispatch();
   
   const addTodolist = useCallback(
@@ -18,9 +20,14 @@ const TodolistContainer = () => {
   );
   
   useEffect(() => {
+    if (!isLoggedIn) return;
+    
     dispatch(getTodolistTC());
   }, [dispatch]);
   
+  if (!isLoggedIn) {
+    return <Navigate to={"/login"}/>;
+  }
   return (
     <>
       <Grid container style={{padding: "40px 40px 40px 0px"}}>
