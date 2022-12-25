@@ -11,9 +11,9 @@ import {
   updateTodolistTitleTC
 } from "../../state/todolist-reducer";
 import {
-  addTaskTC,
+  addTaskTC, changeEntityStatusAC,
   deleteTaskTC,
-  getTasksTC,
+  getTasksTC, TasksDomainType,
   updateTaskTC,
   updateTaskTitleTC
 } from "../../state/task-reducer";
@@ -36,8 +36,7 @@ const Todolist = memo(({todolistId, filter, title, entityStatus}: TodolistPropsT
   console.log('Todolist_RERENDER');
   
   const dispatch = useAppDispatch();
-  let tasks = useAppSelector<Array<TTaskApi>>(state => state.tasks[todolistId]);
-  
+  let tasks = useAppSelector<Array<TTaskApi & TasksDomainType>>(state => state.tasks[todolistId]);
   useEffect(() => {
     dispatch(getTasksTC(todolistId));
   }, [dispatch, todolistId]);
@@ -57,10 +56,6 @@ const Todolist = memo(({todolistId, filter, title, entityStatus}: TodolistPropsT
   const changeTodolistTitle = useCallback((title: string) => {
     dispatch(updateTodolistTitleTC(todolistId, title));
   }, [dispatch, todolistId]);
-  
-  // const removeTask = useCallback((taskId: string, todolistId: string) => {
-  //   dispatch(removeTaskAC(taskId, todolistId));
-  // }, [dispatch]);
   
   const changeTaskStatus = useCallback((todolistId: string, taskID: string, status: TaskStatusesType) => {
     dispatch(updateTaskTC(todolistId, taskID, status));
@@ -87,6 +82,7 @@ const Todolist = memo(({todolistId, filter, title, entityStatus}: TodolistPropsT
   
   const onChangeTitleHandler = useCallback((taskID: string, newValue: string) => {
     changeTaskTitle(todolistId, taskID, newValue);
+    dispatch(changeEntityStatusAC(todolistId, taskID, 'loading'));
   }, [changeTaskTitle, todolistId]);
   
   
@@ -119,6 +115,7 @@ const Todolist = memo(({todolistId, filter, title, entityStatus}: TodolistPropsT
                     taskID={t.id}
                     status={t.status}
                     title={t.title}
+                    entityStatus={t.entityStatus}
                     onChangeStatus={onChangeStatusHandler}
                     onChangeTitle={onChangeTitleHandler}
                     onClickRemove={onClickRemoveHandler}
